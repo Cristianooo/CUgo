@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1041544428718",
+    "firebase_url": "https://cugo-accounts.firebaseio.com",
+    "project_id": "cugo-accounts",
+    "storage_bucket": "cugo-accounts.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041544428718:android:5b6e2781e2d8853b",
+        "android_client_info": {
+          "package_name": "com.example.cugoproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041544428718-g51cmvaauj63iepovoj3em4l2lqv9s2r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBBcakP5yn9lmmhMmeII-V2jvqM-X1od4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
