@@ -1,132 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'Location.dart';
+import 'CreateEvent.dart';
+import 'Event.dart';
 
 class FirstTab extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _FirstTabState();
 }
 
+final myColor= const Color(0xff332D2D);
 class _FirstTabState extends State<FirstTab> {
-  static Location af = new Location(
-      title: 'Agyros Forum', geopoint: GeoPoint(33.792995, -117.850680));
-  static Location lib = new Location(
-      title: 'Leatherby Libraries', geopoint: GeoPoint(33.792895, -117.851275));
-  final _chapLocations = [af, lib];
-  String _currentItemSelected;
-  GeoPoint _tempLocation;
 
   final nameController = TextEditingController();
   final descController = TextEditingController();
   final locationController = TextEditingController();
 
-  DateTime _date = new DateTime.now();
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime.now().subtract(new Duration(days: 1)),
-      lastDate: DateTime.now().add(new Duration(days: 365)),
-    );
-
-    if (picked != null && picked != _date) {
-      print("Date selected: ${_date.toString()}");
-      setState(() {
-        _date = picked;
-      });
-    }
-  }
-
-  void _addEvent() {
-    for (Location myGeo in _chapLocations) {
-      if (_currentItemSelected == myGeo.title) {
-        _tempLocation = myGeo.geopoint;
-      }
-    }
-    Firestore.instance.collection('events').document().setData({
-      'name': nameController.text,
-      'description': descController.text,
-      'date': _date,
-      'location': _tempLocation,
-    });
-  }
-
   void _showModalSheet() {
     showModalBottomSheet(
         context: context,
         builder: (builder) {
-          return new Column(
-            children: <Widget>[
-              new Container(
-                color: Colors.blueAccent,
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    new GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: new Text('Cancel',
-                            style: new TextStyle(color: Colors.white))),
-                    new Center(
-                      child: Text('Create an Event',
-                          style: new TextStyle(color: Colors.white)),
-                    ),
-                    new RaisedButton(
-                      child: Text('Create Event'),
-                      onPressed: _addEvent,
-                    )
-                  ],
-                ),
-              ),
-              new Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    new ListTile(
-                      leading: Text('Name of Event'),
-                      title: new TextField(
-                        controller: nameController,
-                      ),
-                    ),
-                    new ListTile(
-                      leading: Text('Description of Event'),
-                      title: new TextField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        controller: descController,
-                      ),
-                    ),
-                    new ListTile(
-                        leading: Text('Date of Event'),
-                        trailing: new RaisedButton(
-                          child: Text('Pick a date'),
-                          onPressed: () {
-                            _selectDate(context);
-                          },
-                        )),
-                    new ListTile(
-                      leading: Text('Location of Event'),
-                      trailing: new DropdownButton<String>(
-                        items: _chapLocations.map((Location myLocation) {
-                          return DropdownMenuItem<String>(
-                            value: myLocation.title,
-                            child: Text(myLocation.title),
-                          );
-                        }).toList(),
-                        hint: Text('Select Item'),
-                        onChanged: (String newSelect) {
-                          setState(() {
-                            _currentItemSelected = newSelect;
-                          });
-                        },
-                        value: _currentItemSelected,
-                      ),
-                    ),
-                  ]),
-            ],
-          );
+          return new CreateEvent();
+          
         });
+  }
+  void _showEventPage(Event myEvent){
+     Navigator.push(
+      context,
+    MaterialPageRoute(builder: (context) => SecondRoute(myEvent)),
+  );
   }
 
   @override
@@ -137,7 +38,7 @@ class _FirstTabState extends State<FirstTab> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return new StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance.collection('events').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -158,6 +59,11 @@ class _FirstTabState extends State<FirstTab> {
                       return new ListTile(
                         title: new Text(document['name']),
                         subtitle: new Text(document['description']),
+                         
+                        onTap:(){
+                          Event myEvent = new Event(document['name'], document['description'], document['date'], document['location']);
+                          _showEventPage(myEvent);
+                        }
                       );
                     }).toList(),
                   ),
@@ -175,5 +81,77 @@ class _FirstTabState extends State<FirstTab> {
               );
           }
         });
+  }
+}
+class SecondRoute extends StatelessWidget {
+  final Event myEvent;
+  SecondRoute(this.myEvent);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: new AppBar(
+          title: new Padding(
+              child: new Text("CU Go"),
+              padding: const EdgeInsets.only(left: 20.0)),
+            actions: <Widget>[
+            new FlatButton(
+              child:
+                  new Text("Report Event", style: TextStyle(color: Colors.white)),
+              onPressed: null,
+            ),
+          ],  
+      ), 
+      body: new Container(
+        child : new Padding(
+          padding: EdgeInsets.all(16),
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(myEvent.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ),
+         Padding(
+          padding: EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+          child: Row(
+           children: <Widget>[
+             Text('February 20  ', textAlign: TextAlign.left ),
+             Text('7:00 pm', style: TextStyle(color: Colors.grey))
+           ],
+         ),
+         ),
+         Padding(
+           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+           child: Text('Leatherby Libraries'),
+         ),
+         Padding(
+           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 8.0),
+           child: Text('Host: Wilkinson College'),
+         ),
+          Padding(
+           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+           child: Text('About', style: TextStyle(fontSize:16)),
+         ),
+         Padding(
+           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+           child: Text(myEvent.description, textAlign: TextAlign.left, style: TextStyle(color:Colors.grey)),
+         ),
+         Padding(
+           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+           child: Text('Accessibility'),
+         ),
+          Padding(
+           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+          child: Text('Note: this person did not idicate if this event was accessible for the sight impaired or the hearing impaired.', style: TextStyle(color:myColor)),
+         ),
+
+        ],
+        )
+        )
+        
+      )
+       
+    );
   }
 }

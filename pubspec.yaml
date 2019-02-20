@@ -13,6 +13,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
+  flutter_calendar: ^0.0.8
   cloud_firestore:
 
   flutter:
@@ -25,6 +26,8 @@ dependencies:
 
   firebase_database: any
   firebase_core: any
+
+  date_format: ^1.0.6
 
 dev_dependencies:
   flutter_test:

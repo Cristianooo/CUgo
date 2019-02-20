@@ -3,6 +3,7 @@ import 'auth.dart';
 import 'Choice.dart';
 import 'firstTab.dart' as first;
 import 'secondTab.dart' as second;
+import 'thirdTab.dart' as third;
 
 const List<Choice> choices = const <Choice>[
   const Choice(title: 'Events', icon: Icons.calendar_view_day),
@@ -53,6 +54,7 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             new first.FirstTab(),
             new second.SecondTab(),
+            new third.ThirdTab(),
 
           ]
         ),
