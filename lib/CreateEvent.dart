@@ -63,26 +63,34 @@ class _CreateEvent extends State<CreateEvent> {
   @override
   Widget build(BuildContext context) {
       return new Column(
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               new Container(
                 color: Colors.blueAccent,
+                height:50,
                 child: new Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    new GestureDetector(
+                    new Padding(
+                      padding:EdgeInsets.only(left:8.0),
+                      child: new GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
                         },
                         child: new Text('Cancel',
                             style: new TextStyle(color: Colors.white))),
-                    new Center(
-                      child: Text('Create an Event',
-                          style: new TextStyle(color: Colors.white)),
                     ),
-                    new RaisedButton(
-                      child: Text('Create Event'),
-                      onPressed: _addEvent,
-                    )
+                    new Padding(
+                      padding: EdgeInsets.only(right:8.0),
+                      child: new GestureDetector(
+                      onTap: () {
+                        _addEvent();
+                        Navigator.pop(context);
+                      },
+                      child: new Text('Create Event', 
+                      style: new TextStyle(color: Colors.white)),
+                    ),
+                    ),
                   ],
                 ),
               ),
@@ -91,16 +99,18 @@ class _CreateEvent extends State<CreateEvent> {
                   children: <Widget>[
                     new ListTile(
                       leading: Text('Name of Event'),
-                      title: new TextField(
+                      title: new TextFormField(
                         controller: nameController,
+                        validator: (value) => value.isEmpty ? 'Event name can\'t be empty' : null,
                       ),
                     ),
                     new ListTile(
                       leading: Text('Description of Event'),
-                      title: new TextField(
+                      title: new TextFormField(
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         controller: descController,
+                        validator: (value) => value.isEmpty ? 'Event description can\'t be empty' : null,
                       ),
                     ),
                     new ListTile(
@@ -115,11 +125,11 @@ class _CreateEvent extends State<CreateEvent> {
                       leading: Text('Location of Event'),
                       trailing: new DropdownButton<String>(
                         items: _chapLocations.map((Location myLocation) {
-                          return DropdownMenuItem<String>(
-                            value: myLocation.title,
-                            child: Text(myLocation.title),
-                          );
-                        }).toList(),
+                          return DropdownMenuItem<String>( 
+                            value: myLocation.title, 
+                            child: Text(myLocation.title), 
+                          ); 
+                        }).toList(), 
                         hint: Text('Select Item'),
                         onChanged: (String newSelect) {
                           setState(() {

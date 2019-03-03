@@ -15,6 +15,7 @@ environment:
 dependencies:
   flutter_calendar: ^0.0.8
   cloud_firestore:
+  font_awesome_flutter: ^8.4.0
 
   flutter:
     sdk: flutter

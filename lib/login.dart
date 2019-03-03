@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth.dart';
+import 'FinishAccount.dart';
 
 class LoginPage extends StatefulWidget{
   LoginPage({this.auth, this.onSignedIn});
@@ -44,6 +45,10 @@ class _LoginPageState extends State<LoginPage> {
         else{
           String userId = await widget.auth.createUserWithEmailAndPassword(_email, _password);
           print('Created user: $userId');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => FinishAccount()),
+        );
         }
         widget.onSignedIn();
       }
@@ -72,7 +77,6 @@ class _LoginPageState extends State<LoginPage> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('CUgo'),
-
       ),
       body: new Container(
         padding: EdgeInsets.all(16.0),
@@ -111,14 +115,18 @@ class _LoginPageState extends State<LoginPage> {
       ),
       new FlatButton(
         child: new Text('Create an account', style: new TextStyle(fontSize: 20.0)),
-        onPressed: moveToRegister,
+        onPressed: (){
+          moveToRegister();
+        }
        )
     ];
     }else{
       return [
       new RaisedButton(
         child: Text('Create an account', style: new TextStyle(fontSize: 20.0)),
-        onPressed: validateAndSubmit,
+        onPressed: (){
+          validateAndSubmit();
+        }
       ),
       new FlatButton(
         child: new Text('Have an account? Login', style: new TextStyle(fontSize: 20.0)),

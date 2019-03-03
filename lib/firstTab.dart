@@ -145,7 +145,6 @@ class SecondRoute extends StatelessWidget {
            padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
           child: Text('Note: this person did not idicate if this event was accessible for the sight impaired or the hearing impaired.', style: TextStyle(color:myColor)),
          ),
-
         ],
         )
         )
