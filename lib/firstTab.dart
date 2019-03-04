@@ -40,7 +40,7 @@ class _FirstTabState extends State<FirstTab> {
   @override
   Widget build(BuildContext context){
     return new StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance.collection('events').snapshots(),
+        stream: Firestore.instance.collection('events').orderBy('date').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {

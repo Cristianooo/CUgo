@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'auth.dart';
 import 'Choice.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'firstTab.dart' as first;
 import 'secondTab.dart' as second;
 import 'thirdTab.dart' as third;
@@ -11,9 +11,9 @@ import 'ProfilePage.dart';
 
 
 const List<Choice> choices = const <Choice>[
-  const Choice(title: 'Events', icon: Icons.calendar_view_day),
-  const Choice(title: 'Calendar', icon: Icons.event),
-  const Choice(title: 'Map', icon: Icons.map),
+  const Choice(title: 'Events', icon: FontAwesomeIcons.bars),
+  const Choice(title: 'Calendar', icon: FontAwesomeIcons.calendarAlt),
+  const Choice(title: 'Map', icon: FontAwesomeIcons.globeAmericas),
 ];
 String userUID;
   void findCorrectDB() async{
