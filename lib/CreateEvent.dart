@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Location.dart';
 
@@ -8,9 +9,8 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEvent extends State<CreateEvent> {
-
   static Location af = new Location(
-      title: 'Agyros Forum', geopoint: GeoPoint(33.792995, -117.850680));
+      title: 'Argyros Forum', geopoint: GeoPoint(33.792995, -117.850680));
   static Location lib = new Location(
       title: 'Leatherby Libraries', geopoint: GeoPoint(33.792895, -117.851275));
   final _chapLocations = [af, lib];
@@ -21,7 +21,7 @@ class _CreateEvent extends State<CreateEvent> {
   final descController = TextEditingController();
   final locationController = TextEditingController();
 
- @override
+  @override
   void dispose() {
     nameController.dispose();
     descController.dispose();
@@ -29,6 +29,8 @@ class _CreateEvent extends State<CreateEvent> {
   }
 
   DateTime _date = new DateTime.now();
+  String _dateText = "";
+  var eventDayFormat = new DateFormat("EEEE  MMMM d, y");
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -42,6 +44,7 @@ class _CreateEvent extends State<CreateEvent> {
       print("Date selected: ${_date.toString()}");
       setState(() {
         _date = picked;
+        _dateText = eventDayFormat.format(_date);
       });
     }
   }
@@ -62,85 +65,93 @@ class _CreateEvent extends State<CreateEvent> {
 
   @override
   Widget build(BuildContext context) {
-      return new Column(
-            mainAxisSize: MainAxisSize.max,
+    return new Column(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        new Container(
+          color: Colors.blueAccent,
+          height: 50,
+          child: new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              new Container(
-                color: Colors.blueAccent,
-                height:50,
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    new Padding(
-                      padding:EdgeInsets.only(left:8.0),
-                      child: new GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: new Text('Cancel',
-                            style: new TextStyle(color: Colors.white))),
-                    ),
-                    new Padding(
-                      padding: EdgeInsets.only(right:8.0),
-                      child: new GestureDetector(
-                      onTap: () {
-                        _addEvent();
-                        Navigator.pop(context);
-                      },
-                      child: new Text('Create Event', 
+              new Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: new GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: new Text('Cancel',
+                        style: new TextStyle(color: Colors.white))),
+              ),
+              new Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: new GestureDetector(
+                  onTap: () {
+                    _addEvent();
+                    Navigator.pop(context);
+                  },
+                  child: new Text('Create Event',
                       style: new TextStyle(color: Colors.white)),
-                    ),
-                    ),
-                  ],
                 ),
               ),
-              new Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    new ListTile(
-                      leading: Text('Name of Event'),
-                      title: new TextFormField(
-                        controller: nameController,
-                        validator: (value) => value.isEmpty ? 'Event name can\'t be empty' : null,
-                      ),
-                    ),
-                    new ListTile(
-                      leading: Text('Description of Event'),
-                      title: new TextFormField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        controller: descController,
-                        validator: (value) => value.isEmpty ? 'Event description can\'t be empty' : null,
-                      ),
-                    ),
-                    new ListTile(
-                        leading: Text('Date of Event'),
-                        trailing: new RaisedButton(
+            ],
+          ),
+        ),
+        new Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              new ListTile(
+                leading: Text('Name of Event'),
+                title: new TextFormField(
+                  controller: nameController,
+                  validator: (value) =>
+                      value.isEmpty ? 'Event name can\'t be empty' : null,
+                ),
+              ),
+              new ListTile(
+                leading: Text('Description of Event'),
+                title: new TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  controller: descController,
+                  validator: (value) => value.isEmpty
+                      ? 'Event description can\'t be empty'
+                      : null,
+                ),
+              ),
+              new ListTile(
+                  leading: Text('Date of Event'),
+                  trailing: new Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        new RaisedButton(
                           child: Text('Pick a date'),
                           onPressed: () {
                             _selectDate(context);
                           },
-                        )),
-                    new ListTile(
-                      leading: Text('Location of Event'),
-                      trailing: new DropdownButton<String>(
-                        items: _chapLocations.map((Location myLocation) {
-                          return DropdownMenuItem<String>( 
-                            value: myLocation.title, 
-                            child: Text(myLocation.title), 
-                          ); 
-                        }).toList(), 
-                        hint: Text('Select Item'),
-                        onChanged: (String newSelect) {
-                          setState(() {
-                            _currentItemSelected = newSelect;
-                          });
-                        },
-                        value: _currentItemSelected,
-                      ),
-                    ),
-                  ]),
-            ],
-          );
-    }
+                        ),
+                        new Text(_dateText)
+                      ])),
+              new ListTile(
+                leading: Text('Location of Event'),
+                trailing: new DropdownButton<String>(
+                  items: _chapLocations.map((Location myLocation) {
+                    return DropdownMenuItem<String>(
+                      value: myLocation.title,
+                      child: Text(myLocation.title),
+                    );
+                  }).toList(),
+                  hint: Text('Select Item'),
+                  onChanged: (String newSelect) {
+                    setState(() {
+                      _currentItemSelected = newSelect;
+                    });
+                  },
+                  value: _currentItemSelected,
+                ),
+              ),
+            ]),
+      ],
+    );
+  }
 }

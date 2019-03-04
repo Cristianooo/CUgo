@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'CreateEvent.dart';
 import 'Event.dart';
@@ -8,9 +9,9 @@ class FirstTab extends StatefulWidget {
   State<StatefulWidget> createState() => new _FirstTabState();
 }
 
-final myColor= const Color(0xff332D2D);
-class _FirstTabState extends State<FirstTab> {
+final myColor = const Color(0xff332D2D);
 
+class _FirstTabState extends State<FirstTab> {
   final nameController = TextEditingController();
   final descController = TextEditingController();
   final locationController = TextEditingController();
@@ -20,14 +21,14 @@ class _FirstTabState extends State<FirstTab> {
         context: context,
         builder: (builder) {
           return new CreateEvent();
-          
         });
   }
-  void _showEventPage(Event myEvent){
-     Navigator.push(
+
+  void _showEventPage(Event myEvent) {
+    Navigator.push(
       context,
-    MaterialPageRoute(builder: (context) => SecondRoute(myEvent)),
-  );
+      MaterialPageRoute(builder: (context) => SecondRoute(myEvent)),
+    );
   }
 
   @override
@@ -38,7 +39,10 @@ class _FirstTabState extends State<FirstTab> {
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    var eventTimeFormat = new DateFormat("jm");
+    var eventDateFormat = new DateFormat("MMMd");
+
     return new StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance.collection('events').orderBy('date').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -56,15 +60,30 @@ class _FirstTabState extends State<FirstTab> {
                     shrinkWrap: true,
                     children: snapshot.data.documents
                         .map((DocumentSnapshot document) {
-                      return new ListTile(
-                        title: new Text(document['name']),
-                        subtitle: new Text(document['description']),
-                         
-                        onTap:(){
-                          Event myEvent = new Event(document['name'], document['description'], document['date'], document['location']);
-                          _showEventPage(myEvent);
-                        }
-                      );
+                      return new Center(
+                          child: Card(
+                              child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                              leading: new Text(eventDateFormat
+                                  .format(document['date'].toDate())),
+                              title: new Text(document['name']),
+                              subtitle: new Text(document['description']),
+                              onTap: () {
+                                Event myEvent = new Event(
+                                    document['name'],
+                                    document['description'],
+                                    document['date'],
+                                    document['location']);
+                                _showEventPage(myEvent);
+                              }),
+                          ListTile(
+                              leading: const Icon(Icons.access_time),
+                              subtitle: Text(eventTimeFormat
+                                  .format(document['date'].toDate()))),
+                        ],
+                      )));
                     }).toList(),
                   ),
                   Positioned(
@@ -83,74 +102,90 @@ class _FirstTabState extends State<FirstTab> {
         });
   }
 }
+
 class SecondRoute extends StatelessWidget {
   final Event myEvent;
   SecondRoute(this.myEvent);
+  var eventDayFormat = new DateFormat("yMMMMd");
+  var eventTimeFormat = new DateFormat("jm");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new AppBar(
+        appBar: new AppBar(
           title: new Padding(
               child: new Text("CU Go"),
               padding: const EdgeInsets.only(left: 20.0)),
-            actions: <Widget>[
+          actions: <Widget>[
             new FlatButton(
-              child:
-                  new Text("Report Event", style: TextStyle(color: Colors.white)),
+              child: new Text("Report Event",
+                  style: TextStyle(color: Colors.white)),
               onPressed: null,
             ),
-          ],  
-      ), 
-      body: new Container(
-        child : new Padding(
-          padding: EdgeInsets.all(16),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(myEvent.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ),
-         Padding(
-          padding: EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-          child: Row(
-           children: <Widget>[
-             Text('February 20  ', textAlign: TextAlign.left ),
-             Text('7:00 pm', style: TextStyle(color: Colors.grey))
-           ],
-         ),
-         ),
-         Padding(
-           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-           child: Text('Leatherby Libraries'),
-         ),
-         Padding(
-           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 8.0),
-           child: Text('Host: Wilkinson College'),
-         ),
-          Padding(
-           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-           child: Text('About', style: TextStyle(fontSize:16)),
-         ),
-         Padding(
-           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-           child: Text(myEvent.description, textAlign: TextAlign.left, style: TextStyle(color:Colors.grey)),
-         ),
-         Padding(
-           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-           child: Text('Accessibility'),
-         ),
-          Padding(
-           padding:EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-          child: Text('Note: this person did not idicate if this event was accessible for the sight impaired or the hearing impaired.', style: TextStyle(color:myColor)),
-         ),
-        ],
-        )
-        )
-        
-      )
-       
-    );
+          ],
+        ),
+        body: new Container(
+            child: new Padding(
+                padding: EdgeInsets.all(16),
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(myEvent.name,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      child: Row(
+                        children: <Widget>[
+                          Text(eventDayFormat.format(myEvent.date.toDate()),
+                              style: TextStyle(color: Colors.grey),
+                              textAlign: TextAlign.left),
+                          Text(
+                              ' @ ' +
+                                  eventTimeFormat.format(myEvent.date.toDate()),
+                              style: TextStyle(color: Colors.grey))
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      child: Text('Leatherby Libraries'),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 8.0),
+                      child: Text('Host: Wilkinson College'),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      child: Text('About', style: TextStyle(fontSize: 16)),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      child: Text(myEvent.description,
+                          textAlign: TextAlign.left,
+                          style: TextStyle(color: Colors.grey)),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      child: Text('Accessibility'),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      child: Text(
+                          'Note: this person did not idicate if this event was accessible for the sight impaired or the hearing impaired.',
+                          style: TextStyle(color: myColor)),
+                    ),
+                  ],
+                ))));
   }
 }
