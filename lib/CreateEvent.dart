@@ -49,7 +49,47 @@ class _CreateEvent extends State<CreateEvent> {
     }
   }
 
+  TimeOfDay _time = new TimeOfDay.now();
+  String _timeText = "";
+  Future<Null> _selectTime(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: _time
+    );
+
+    if (picked != null) {
+      print("Time selected: " + todString(_time));
+      setState(() {
+        _time = picked;
+        _timeText = todString(_time);
+      });
+    }
+  }
+
+  String todString(TimeOfDay time){
+    int hourConvert = time.hour;
+    int minConvert = time.minute;
+    String ampm = "AM";
+    if (time.hour > 12){
+      ampm = "PM";
+      hourConvert -= 12;
+    }
+
+    final String hourLabel = hourConvert.toString();
+    String minuteLabel = '';
+    if (time.minute < 10)
+    {
+      minuteLabel = "0" + time.minute.toString();
+    }
+    else{
+      minuteLabel = time.minute.toString();
+    }
+
+    return '$hourLabel:$minuteLabel $ampm';
+  }
   void _addEvent() {
+    DateTime _finalDate = new DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
+
     for (Location myGeo in _chapLocations) {
       if (_currentItemSelected == myGeo.title) {
         _tempLocation = myGeo.geopoint;
@@ -58,7 +98,7 @@ class _CreateEvent extends State<CreateEvent> {
     Firestore.instance.collection('events').document().setData({
       'name': nameController.text,
       'description': descController.text,
-      'date': _date,
+      'date': _finalDate,
       'location': _tempLocation,
     });
   }
@@ -119,7 +159,9 @@ class _CreateEvent extends State<CreateEvent> {
                       : null,
                 ),
               ),
-              new ListTile(
+              new Padding(
+                padding:EdgeInsets.only(top:5),
+                child: new ListTile(
                   leading: Text('Date of Event'),
                   trailing: new Column(
                       mainAxisSize: MainAxisSize.min,
@@ -132,6 +174,23 @@ class _CreateEvent extends State<CreateEvent> {
                         ),
                         new Text(_dateText)
                       ])),
+              ),
+              new Padding(
+                padding:EdgeInsets.only(top: 5),
+                child: new ListTile(
+                  leading: Text('Time of Event'),
+                  trailing: new Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        new RaisedButton(
+                          child: Text('Pick a time'),
+                          onPressed: () {
+                            _selectTime(context);
+                          },
+                        ),
+                        new Text(_timeText)
+                      ])),
+              ),   
               new ListTile(
                 leading: Text('Location of Event'),
                 trailing: new DropdownButton<String>(

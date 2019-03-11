@@ -147,9 +147,9 @@ class _ProfilePage extends State<ProfilePage> {
                       child: Text('Sign out'),
                       color: Colors.red,
                       onPressed: () {
-                        setState(() {
                           _signOut();
-                        });
+                          Navigator.pop(context);
+
                       }),
                 )
               ],

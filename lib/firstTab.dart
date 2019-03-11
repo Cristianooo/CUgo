@@ -80,7 +80,7 @@ class _FirstTabState extends State<FirstTab> {
                               }),
                           ListTile(
                               leading: const Icon(Icons.access_time),
-                              subtitle: Text(eventTimeFormat
+                              title: Text(eventTimeFormat
                                   .format(document['date'].toDate()))),
                         ],
                       )));
@@ -106,8 +106,8 @@ class _FirstTabState extends State<FirstTab> {
 class SecondRoute extends StatelessWidget {
   final Event myEvent;
   SecondRoute(this.myEvent);
-  var eventDayFormat = new DateFormat("yMMMMd");
-  var eventTimeFormat = new DateFormat("jm");
+  final eventDayFormat = new DateFormat("yMMMMd");
+  final eventTimeFormat = new DateFormat("jm");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
