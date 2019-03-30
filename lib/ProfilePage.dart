@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'ProfileFiles/PersonalInformation.dart';
 import 'ProfileFiles/LoginInformation.dart';
 
 import 'auth.dart';
@@ -19,6 +19,12 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePage extends State<ProfilePage> {
 
+String idToken;           
+void findUserIdToken() async{                 //Assigns current user's id token so that the password can be changed in LoginInformation.dart
+    var token = await FirebaseAuth.instance.currentUser();
+    idToken=token.getIdToken().toString();
+  }
+
  Color lightGrey= const Color(0xffba0006);
   void _signOut() async {
     try {
@@ -33,27 +39,54 @@ class _ProfilePage extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    
-    return Scaffold(
-        appBar: new AppBar(
-          title: new Padding(
-              child: new Text("Profile Page"),
-              padding: const EdgeInsets.only(left: 20.0)),
-        ),
-        body: new Container(
-            padding: EdgeInsets.all(8.0),
-            width: MediaQuery.of(context).size.width,
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  height: 150,
-                  width: 150,
-                  child: new PhysicalModel(
-                      color: Colors.blue,
-                      borderRadius: new BorderRadius.circular(100.0),
-                      child: Icon(FontAwesomeIcons.kiwiBird, size: 50)),
+    return Material(
+      child: Column(
+        children: <Widget>[
+              Container(
+                height: MediaQuery.of(context).size.height / 3,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(200.0),
+                    bottomRight: Radius.circular(200.0),
+                  )
                 ),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 60.0),
+                  child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    FlatButton(
+                      child: Icon(FontAwesomeIcons.chevronLeft, size:25, color: Colors.white,),
+                      onPressed: (){
+                        Navigator.pop(context);
+                        },
+                    ),
+                    Center(
+                      child: Container(
+                        width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: new DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage("https://nexttravelnursing.com/wp-content/uploads/2018/02/Aleesha-Bartlett-Bitmoji.png")
+                        )
+                      ),
+                      )
+                    )
+                  ],
+                )
+                ),
+                
+                
+              ),
+           Container(
+              height: MediaQuery.of(context).size.height *.66,
+              width: MediaQuery.of(context).size.width,
+            child: new ListView(
+              children: <Widget>[
                 new StreamBuilder(
                     stream: Firestore.instance
                         .collection('Users')
@@ -75,20 +108,20 @@ class _ProfilePage extends State<ProfilePage> {
                                     child: Text(
                                         snapshot.data.documents[0]
                                             ['First Name'],
-                                        style: TextStyle(fontSize: 20)),
+                                        style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
                                   ),
                                   Text(snapshot.data.documents[0]['Last Name'],
-                                      style: TextStyle(fontSize: 20)),
+                                      style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)),
                                 ]),
                           ),
                           new Padding(
                             padding: EdgeInsets.only(top: 5),
                             child: Text(
                                 snapshot.data.documents[0]['Grade Level'],
-                                style: TextStyle(fontSize: 20)),
+                                style: TextStyle(fontSize: 26)),
                           ),
                           new Padding(
-                              padding: EdgeInsets.only(top: 30),
+                              padding: EdgeInsets.only(top: 40),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
@@ -99,7 +132,7 @@ class _ProfilePage extends State<ProfilePage> {
                                           (snapshot.data.documents[0]
                                                   ['EventAmt'])
                                               .toString(),
-                                          style: TextStyle(fontSize: 40)),
+                                          style: TextStyle(fontSize: 50)),
                                       Text('Events Attended',
                                           style: TextStyle(fontSize: 16))
                                     ],
@@ -110,7 +143,7 @@ class _ProfilePage extends State<ProfilePage> {
                                           (snapshot.data.documents[0]
                                                   ['PointsAmt'])
                                               .toString(),
-                                          style: TextStyle(fontSize: 40)),
+                                          style: TextStyle(fontSize: 50)),
                                       Text('Points Achieved',
                                           style: TextStyle(fontSize: 16))
                                     ],
@@ -132,13 +165,6 @@ class _ProfilePage extends State<ProfilePage> {
                       ),
                       onPressed: _changeLoginInformation,
                     ),
-                    RaisedButton(
-                      child:  new Align(
-                         alignment: Alignment.centerLeft,
-                         child: Text('Personal Information', style: TextStyle(color: Colors.black))
-                      ),
-                      onPressed: _changePersonalInfo,
-                    ),
                   ],
                 ),
                 new Padding(
@@ -153,18 +179,17 @@ class _ProfilePage extends State<ProfilePage> {
                       }),
                 )
               ],
-            )));
+            )),
+            
+        ],
+      )
+     );
   }
   void _changeLoginInformation(){
+    findUserIdToken();
     Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LoginInformation()),
-              );
-  }
-  void _changePersonalInfo() {
-    Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => PersonalInformation()),
-              );
+              MaterialPageRoute(builder: (context) => LoginInformation(userToken: idToken,)),
+            );
   }
 }

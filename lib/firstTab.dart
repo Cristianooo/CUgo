@@ -3,33 +3,24 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'CreateEvent.dart';
 import 'Event.dart';
+import 'EventDetails.dart';
 
 class FirstTab extends StatefulWidget {
+  const FirstTab(this.uid);
+  final String uid;
+
   @override
   State<StatefulWidget> createState() => new _FirstTabState();
 }
-
-final myColor = const Color(0xff332D2D);
 
 class _FirstTabState extends State<FirstTab> {
   final nameController = TextEditingController();
   final descController = TextEditingController();
   final locationController = TextEditingController();
 
-  void _showModalSheet() {
-    showModalBottomSheet(
-        context: context,
-        builder: (builder) {
-          return new CreateEvent();
-        });
-  }
+ 
 
-  void _showEventPage(Event myEvent) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SecondRoute(myEvent)),
-    );
-  }
+ 
 
   @override
   void dispose() {
@@ -44,7 +35,8 @@ class _FirstTabState extends State<FirstTab> {
     var eventDateFormat = new DateFormat("MMMd");
 
     return new StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance.collection('events').orderBy('date').snapshots(),
+        stream:
+            Firestore.instance.collection('events').orderBy('date').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
@@ -71,17 +63,15 @@ class _FirstTabState extends State<FirstTab> {
                               title: new Text(document['name']),
                               subtitle: new Text(document['description']),
                               onTap: () {
-                                Event myEvent = new Event(
-                                    document['name'],
-                                    document['description'],
-                                    document['date'],
-                                    document['location']);
-                                _showEventPage(myEvent);
+                                assignAndCreateEvent(document);
                               }),
                           ListTile(
                               leading: const Icon(Icons.access_time),
                               title: Text(eventTimeFormat
-                                  .format(document['date'].toDate()))),
+                                  .format(document['date'].toDate())),
+                              onTap: () {
+                                assignAndCreateEvent(document);
+                              }),
                         ],
                       )));
                     }).toList(),
@@ -91,7 +81,7 @@ class _FirstTabState extends State<FirstTab> {
                       left: 20,
                       child: RaisedButton(
                         child: Icon(Icons.add, color: Colors.white),
-                        onPressed: _showModalSheet,
+                        onPressed: _showProfilePage,
                         shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
                         color: Theme.of(context).accentColor,
@@ -101,91 +91,43 @@ class _FirstTabState extends State<FirstTab> {
           }
         });
   }
-}
 
-class SecondRoute extends StatelessWidget {
-  final Event myEvent;
-  SecondRoute(this.myEvent);
-  final eventDayFormat = new DateFormat("yMMMMd");
-  final eventTimeFormat = new DateFormat("jm");
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: new AppBar(
-          title: new Padding(
-              child: new Text("CU Go"),
-              padding: const EdgeInsets.only(left: 20.0)),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Report Event",
-                  style: TextStyle(color: Colors.white)),
-              onPressed: null,
-            ),
-          ],
-        ),
-        body: new Container(
-            child: new Padding(
-                padding: EdgeInsets.all(16),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(myEvent.name,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-                      child: Row(
-                        children: <Widget>[
-                          Text(eventDayFormat.format(myEvent.date.toDate()),
-                              style: TextStyle(color: Colors.grey),
-                              textAlign: TextAlign.left),
-                          Text(
-                              ' @ ' +
-                                  eventTimeFormat.format(myEvent.date.toDate()),
-                              style: TextStyle(color: Colors.grey))
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-                      child: Text('Leatherby Libraries'),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 8.0),
-                      child: Text('Host: Wilkinson College'),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-                      child: Text('About', style: TextStyle(fontSize: 16)),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-                      child: Text(myEvent.description,
-                          textAlign: TextAlign.left,
-                          style: TextStyle(color: Colors.grey)),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-                      child: Text('Accessibility'),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-                      child: Text(
-                          'Note: this person did not idicate if this event was accessible for the sight impaired or the hearing impaired.',
-                          style: TextStyle(color: myColor)),
-                    ),
-                  ],
-                ))));
+  String eventLocation = "";
+  void assignAndCreateEvent(DocumentSnapshot document) {
+    if (document['location'] == GeoPoint(33.792895, -117.851275)) {
+      eventLocation = "Leatherby Libraries";
+    } else if (document['location'] == GeoPoint(33.792995, -117.850680)) {
+      eventLocation = "Argyros Forum";
+    }else if (document['location'] == GeoPoint(33.794054, -117.850903)) {
+      eventLocation = "Ernie Chapman Stadium";
+    }else if (document['location'] == GeoPoint(33.791995, -117.852535)) {
+      eventLocation = "Memorial Lawn";
+    }else if (document['location'] == GeoPoint(33.792895, -117.851275)) {
+      eventLocation = "Memorial Hall";
+    }else if (document['location'] == GeoPoint(33.793709, -117.852212)) {
+      eventLocation = "FISH Interfaith Center";
+    }else if (document['location'] == GeoPoint(33.793061, -117.851753)) {
+      eventLocation = "Atallah Piazza";
+    }else if (document['location'] == GeoPoint(33.792280, -117.850732)) {
+      eventLocation = "Irvine Lecture Hall";
+    }else if (document['location'] == GeoPoint(33.794164, -117.852634)) {
+      eventLocation = "Musco Center for the Arts";
+    }
+
+    Event myEvent = new Event(document['name'], document['description'],
+        document['date'], eventLocation, document.documentID);
+    _showEventPage(myEvent);
+  }
+ void _showProfilePage() {
+      Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateEvent()),
+    );
+  }
+  void _showEventPage(Event myEvent) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EventDetails(myEvent: myEvent, uid: widget.uid,)),
+    );
   }
 }

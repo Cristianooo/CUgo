@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'Location.dart';
 
 
 //Use this class later
@@ -11,7 +10,7 @@ class EventCard extends StatelessWidget {
 
   final String name;
   final DateTime date;
-  var cardDateFormat = new DateFormat("EEEE  MMMM d, y");
+  final cardDateFormat = new DateFormat("EEEE  MMMM d, y");
   final location;
 
   @override
@@ -22,7 +21,7 @@ class EventCard extends StatelessWidget {
         children: <Widget>[
           const ListTile(
             leading: Icon(Icons.mood),
-            title: Text("imgay"),
+            title: Text("ll"),
             subtitle: Text("This is a chicken wing"),
           )
         ],

@@ -14,6 +14,7 @@ const List<Choice> choices = const <Choice>[
   const Choice(title: 'Events', icon: FontAwesomeIcons.bars),
   const Choice(title: 'Calendar', icon: FontAwesomeIcons.calendarAlt),
   const Choice(title: 'Map', icon: FontAwesomeIcons.globeAmericas),
+  
 ];
 String userUID;
   void findCorrectDB() async{
@@ -26,10 +27,15 @@ class HomePage extends StatelessWidget {
   HomePage({this.auth, this.onSignedOut});
   final BaseAuth auth;
   final VoidCallback onSignedOut;
+  
+    void initState() {
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => findCorrectDB());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+   return DefaultTabController(
       length: choices.length,
       child: new Scaffold(
         appBar: new AppBar(
@@ -45,22 +51,28 @@ class HomePage extends StatelessWidget {
               );}
           ),
           ),
-          
-          title: new Padding(
-              child: new Text("CU Go"),
-              padding: const EdgeInsets.only(left: 20.0)),
           bottom: new TabBar(
             tabs: choices.map((Choice choice) {
-              return Tab(
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.0),
+                    bottomRight: Radius.circular(20.0),
+                  )
+                ),
+                child: Tab(
                 text: choice.title,
                 icon: Icon(choice.icon),
+                
+                )
               );
+              
             }).toList(),
           ),
         ),
         body: TabBarView(
           children: <Widget>[
-            new first.FirstTab(),
+            new first.FirstTab(userUID),
             new second.SecondTab(),
             new third.ThirdTab(),
 

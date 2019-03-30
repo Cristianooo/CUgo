@@ -3,8 +3,9 @@ class Event {
   String description;
   String name;
   Timestamp date;
-  GeoPoint location;
-  Event(this.name, this.description, this.date, this.location);
+  String location;
+  String documentID; 
+  Event(this.name, this.description, this.date, this.location, this.documentID);
 
   
 }
