@@ -7,7 +7,7 @@ import 'firstTab.dart' as first;
 import 'secondTab.dart' as second;
 import 'thirdTab.dart' as third;
 
-import 'ProfilePage.dart';
+import 'ProfilePageFiles/ProfilePage.dart';
 
 
 const List<Choice> choices = const <Choice>[
@@ -75,7 +75,6 @@ class HomePage extends StatelessWidget {
             new first.FirstTab(userUID),
             new second.SecondTab(),
             new third.ThirdTab(),
-
           ]
         ),
       ),

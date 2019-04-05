@@ -5,7 +5,8 @@ class Event {
   Timestamp date;
   String location;
   String documentID; 
-  Event(this.name, this.description, this.date, this.location, this.documentID);
+  String createdBy;
+  Event(this.name, this.description, this.date, this.location, this.documentID, this.createdBy);
 
   
 }

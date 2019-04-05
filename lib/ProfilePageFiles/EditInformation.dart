@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'Location.dart';
+import 'package:cugo_project/Location.dart';
 import 'dart:async';
 
-class CreateEvent extends StatefulWidget {
-  const CreateEvent(this.uid);
-  final String uid;
-
+class EditInformation extends StatefulWidget {
+  const EditInformation({this.snapshot, this.documentID});
+  final AsyncSnapshot snapshot;
+  final String documentID;
 
   @override
-  State<StatefulWidget> createState() => new _CreateEvent();
+  State<StatefulWidget> createState() => new _EditInformationState();
 }
 
-class _CreateEvent extends State<CreateEvent> {
+class _EditInformationState extends State<EditInformation> {
   static Location af = new Location(
       title: 'Argyros Forum', geopoint: GeoPoint(33.792995, -117.850680));
   static Location lib = new Location(
@@ -47,10 +47,26 @@ class _CreateEvent extends State<CreateEvent> {
     musco
   ];
   String _currentItemSelected;
+  GeoPoint _tempLocation;
 
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
-  //final _locationController = TextEditingController();
+
+
+@override
+  void initState() {
+    super.initState();
+
+
+
+    _nameController.text = widget.snapshot.data.document[0]['name'];
+    _descController.text = widget.snapshot.data.document[0]['description'];
+    _currentItemSelected = widget.snapshot.data.document[0]['location'];
+
+    _date = widget.snapshot.data.document[0]['date'].toDate();
+    
+
+  }
 
   @override
   void dispose() {
@@ -59,7 +75,7 @@ class _CreateEvent extends State<CreateEvent> {
     super.dispose();
   }
 
-  DateTime _date = new DateTime.now();
+  DateTime _date;
   String _dateText = "";
   var eventDayFormat = new DateFormat("EEEE  MMMM d, y");
 
@@ -95,7 +111,6 @@ class _CreateEvent extends State<CreateEvent> {
 
   String todString(TimeOfDay time) {
     int hourConvert = time.hour;
-    //int minConvert = time.minute;
     String ampm = "AM";
     if (time.hour > 12) {
       ampm = "PM";
@@ -112,41 +127,26 @@ class _CreateEvent extends State<CreateEvent> {
 
     return '$hourLabel:$minuteLabel $ampm';
   }
-  String monthAndDay(DateTime date) {
-    String mdFinal = "";
-    if (date.day < 10 && date.month < 10)
-    {
-      mdFinal = "0" + date.month.toString() + "0" + date.day.toString();
+  
+  DateTime _finalDate;
+  void _saveEvent() {
+    
+    _finalDate = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
+    for (Location myGeo in _chapLocations) {
+      if (_currentItemSelected == myGeo.title) {
+        _tempLocation = myGeo.geopoint;
+      }
     }
-    else if (date.day < 10 && date.month > 10)
-    {
-      mdFinal = date.month.toString() + "0" + date.day.toString();
-    }
-    else if (date.day > 10 && date.month < 10)
-    {
-      mdFinal = "0" + date.month.toString() + date.day.toString();
-    }
-    else{
-      mdFinal = date.month.toString() + date.day.toString();
-    }
-    return mdFinal;
-  }
-
-  void _addEvent() {
-    DateTime _finalDate = new DateTime(
-        _date.year, _date.month, _date.day, _time.hour, _time.minute);
-      String imgay = monthAndDay(_finalDate);
-
-    Firestore.instance.collection('events').document().setData({
+    Firestore.instance.collection('events').document(widget.documentID).updateData({
       'name': _nameController.text,
       'description': _descController.text,
       'date': _finalDate,
-      'monthDay': imgay,
       'location': _currentItemSelected,
-      'createdBy': widget.uid
+      'createdBy': widget.snapshot.data.document[0]['createdBy']
     });
-    Navigator.pop(context);
+   Navigator.pop(context);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -155,9 +155,9 @@ class _CreateEvent extends State<CreateEvent> {
           elevation: 0.0,
           actions: <Widget>[
             new FlatButton(
-              child: new Text("Create Event",
+              child: new Text("Save changes",
                   style: TextStyle(color: Colors.white)),
-              onPressed: _addEvent,
+              onPressed: _saveEvent,
             ),
           ],
         ),
@@ -201,7 +201,7 @@ class _CreateEvent extends State<CreateEvent> {
                 Column(
                   children: <Widget>[
                   new RaisedButton(
-                    child: Text('Pick a date'),
+                    child: Text('Change the date'),
                     onPressed: () {
                       _selectDate(context);
                     },
@@ -223,7 +223,7 @@ class _CreateEvent extends State<CreateEvent> {
                 Column(
                   children: <Widget>[
                   new RaisedButton(
-                    child: Text('Pick a time'),
+                    child: Text('Change the time'),
                     onPressed: () {
                       _selectTime(context);
                     },
@@ -249,7 +249,7 @@ class _CreateEvent extends State<CreateEvent> {
                     child: Text(myLocation.title),
                   );
                 }).toList(),
-                hint: Text('Select Item'),
+                hint: Text(_currentItemSelected),
                 onChanged: (String newSelect) {
                   setState(() {
                     _currentItemSelected = newSelect;

@@ -1,41 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'Event.dart';
-import 'incorrectDetails.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cugo_project/ProfilePageFiles/EditInformation.dart';
 
-class EventDetails extends StatefulWidget {
-  final Event myEvent;
-  final String uid;
 
-  const EventDetails({this.myEvent, this.uid});
+class MyEventDetails extends StatefulWidget {
+  final String documentID;
+
+  const MyEventDetails({this.documentID});
   @override
-  State<StatefulWidget> createState() => new _EventDetails();
+  State<StatefulWidget> createState() => new _MyEventDetails();
 }
 
-class _EventDetails extends State<EventDetails> {
+class _MyEventDetails extends State<MyEventDetails> {
   final eventDayFormat = new DateFormat("yMMMMd");
   final eventTimeFormat = new DateFormat("jm");
 
   bool beABuddy = false;
   bool haveABuddy = false;
 
-  void incorrectDetails(){
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => IncorrectDetails()));
+  @override
+  void initState() {
+    super.initState();
+   
   }
+
+  String eventLocation;
+  
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return new StreamBuilder(stream: Firestore.instance.collection('events').document(widget.documentID).snapshots(),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData)
+        return Scaffold(
+          appBar: new AppBar(
+            elevation: 0.0
+          ),
+          body: new Material(
+            child: Text('Loading data. Please wait...')
+          )
+        );
+        var document = snapshot.data();
+        return Scaffold(
         appBar: new AppBar(
           elevation: 0.0,
           actions: <Widget>[
             new FlatButton(
-              child: new Text("Incorrect Event Details?",
+              child: new Text("Edit Information",
                   style: TextStyle(color: Colors.white)),
-              onPressed: null,
+              onPressed: (){
+                _editInfo(document);
+                }
             ),
           ],
         ),
@@ -58,7 +75,7 @@ class _EventDetails extends State<EventDetails> {
                                 color: Colors.white)),
                         Padding(
                           padding: EdgeInsets.only(bottom: 40.0),
-                          child: Text(widget.myEvent.name,
+                          child: Text(document['name'],
                               style: TextStyle(
                                   fontSize: 34,
                                   fontWeight: FontWeight.bold,
@@ -70,7 +87,7 @@ class _EventDetails extends State<EventDetails> {
                                 color: Colors.white)),
                         Padding(
                           padding: EdgeInsets.only(bottom: 40.0),
-                          child: Text(widget.myEvent.location,
+                          child: Text(document['location'],
                               style: TextStyle(
                                   fontSize: 24,
                                   color: Colors.white,
@@ -86,7 +103,7 @@ class _EventDetails extends State<EventDetails> {
                             children: <Widget>[
                               Text(
                                   eventDayFormat
-                                      .format(widget.myEvent.date.toDate()),
+                                      .format(document['date'].toDate()),
                                   style: TextStyle(
                                       fontSize: 22,
                                       color: Colors.white,
@@ -95,7 +112,7 @@ class _EventDetails extends State<EventDetails> {
                               Text(
                                   ' @ ' +
                                       eventTimeFormat
-                                          .format(widget.myEvent.date.toDate()),
+                                          .format(document['date'].toDate()),
                                   style: TextStyle(
                                       fontSize: 20, color: Colors.white))
                             ],
@@ -131,7 +148,7 @@ class _EventDetails extends State<EventDetails> {
                           Padding(
                             padding: EdgeInsets.only(bottom: 40.0),
                             child: Text(
-                              widget.myEvent.description,
+                              snapshot.data.document[0]['description'],
                               textAlign: TextAlign.left,
                             ),
                           ),
@@ -156,64 +173,24 @@ class _EventDetails extends State<EventDetails> {
                                   )
                                 ],
                               )),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 0.0),
-                            child: Row(
-                              children: <Widget>[
-                                Checkbox(
-                                  value: beABuddy,
-                                  onChanged: (bool value) {
-                                    setState(() {
-                                      beABuddy = value;
-                                    });
-                                  },
-                                ),
-                                Text('Be a Buddy'),
-                              ],
-                            ),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Checkbox(
-                                value: haveABuddy,
-                                onChanged: (bool value) {
-                                  setState(() {
-                                    haveABuddy = value;
-                                  });
-                                },
-                              ),
-                              Text('Have a Buddy')
-                            ],
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                                padding: EdgeInsets.only(bottom: 40.0),
-                                child: FlatButton(
-                                  child: Text('Whats the Difference?', style: TextStyle(color: Colors.grey)),
-                                  onPressed: null,
-                                )),
-                          ),
-                          RaisedButton(
-                            color: Colors.blue,
-                            child: Text('Sign Up',
-                                style: TextStyle(color: Colors.white)),
-                            onPressed: signUp,
-                          )
                         ],
                       ),
-                    )))
+                )))
           ],
-        )));
+        ))
+        );
+       
+       }
+       );
+
   }
-void signUp(){
-  Firestore.instance.collection('events').document(widget.myEvent.documentID).collection('usersGoing').document().setData({
-    'UID': widget.uid
-  });
-}
+   void _editInfo(AsyncSnapshot snapshot) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditInformation(snapshot: snapshot, documentID: widget.documentID,)),
+    );
+  }
 
 
 
 }
-
-

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'ProfileFiles/LoginInformation.dart';
+import 'package:cugo_project/ProfilePageFiles/LoginInformation.dart';
+import 'package:cugo_project/ProfilePageFiles/myEvents.dart';
 
-import 'auth.dart';
+import 'package:cugo_project/auth.dart';
 
 class ProfilePage extends StatefulWidget {
   final BaseAuth auth;
@@ -157,6 +158,13 @@ void findUserIdToken() async{                 //Assigns current user's id token 
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(20.0),
                   children: <Widget>[
+                    RaisedButton(
+                      child: new Align(
+                         alignment: Alignment.centerLeft,
+                         child: Text('My Events', style: TextStyle(color: Colors.black)),
+                      ),
+                      onPressed: _showEvents,
+                    ),
                     const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
                     RaisedButton(
                       child: new Align(
@@ -185,6 +193,14 @@ void findUserIdToken() async{                 //Assigns current user's id token 
       )
      );
   }
+   void _showEvents(){
+    findUserIdToken();
+    Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyEvents(userUID: widget.userUID,)),
+            );
+  }
+  
   void _changeLoginInformation(){
     findUserIdToken();
     Navigator.push(

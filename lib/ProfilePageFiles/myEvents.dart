@@ -1,28 +1,34 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'CreateEvent.dart';
-import 'Event.dart';
-import 'EventDetails.dart';
+import 'package:cugo_project/Event.dart';
+import 'package:cugo_project/ProfilePageFiles/MyEventDetails.dart';
 
-class FirstTab extends StatefulWidget {
-  const FirstTab(this.uid);
-   final String uid;
+
+class MyEvents extends StatefulWidget {
+  final String userUID;
+
+  const MyEvents({this.userUID});
 
   @override
-  State<StatefulWidget> createState() => new _FirstTabState();
+  State<StatefulWidget> createState() => new _MyEventState();
 }
 
-class _FirstTabState extends State<FirstTab> {
+class _MyEventState extends State<MyEvents> {
   
   @override
   Widget build(BuildContext context) {
     var eventTimeFormat = new DateFormat("jm");
     var eventDateFormat = new DateFormat("MMMd");
 
-    return new StreamBuilder<QuerySnapshot>(
+    return new Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+      ),
+      body: StreamBuilder<QuerySnapshot>(
         stream:
-            Firestore.instance.collection('events').orderBy('date').snapshots(),
+            Firestore.instance.collection('events').where('createdBy', isEqualTo: widget.userUID).orderBy('date').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
@@ -49,35 +55,30 @@ class _FirstTabState extends State<FirstTab> {
                               title: new Text(document['name']),
                               subtitle: new Text(document['description']),
                               onTap: () {
-                                assignAndCreateEvent(document);
+                                
+                                _showEventPage(document.documentID);
                               }),
                           ListTile(
                               leading: const Icon(Icons.access_time),
                               title: Text(eventTimeFormat
                                   .format(document['date'].toDate())),
                               onTap: () {
-                                assignAndCreateEvent(document);
+                               
+                               _showEventPage(document.documentID);
                               }),
                         ],
                       )));
                     }).toList(),
                   ),
-                  Positioned(
-                      bottom: 40,
-                      left: 20,
-                      child: RaisedButton(
-                        child: Icon(Icons.add, color: Colors.white),
-                        onPressed: _createNewEvent,
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        color: Theme.of(context).accentColor,
-                      ))
                 ]),
               );
           }
-        });
-  }
+        })
 
+    );
+    
+    
+  }
   String eventLocation = "";
   void assignAndCreateEvent(DocumentSnapshot document) {
     if (document['location'] == GeoPoint(33.792895, -117.851275)) {
@@ -99,21 +100,17 @@ class _FirstTabState extends State<FirstTab> {
     }else if (document['location'] == GeoPoint(33.794164, -117.852634)) {
       eventLocation = "Musco Center for the Arts";
     }
+    //Event myEvent = new Event(document['name'], document['description'],
+    //    document['date'], eventLocation, document.documentID, document['createdBy']);
+   // _showEventPage(myEvent);
 
-    Event myEvent = new Event(document['name'], document['description'],
-        document['date'], eventLocation, document.documentID, document['createdBy']);
-    _showEventPage(myEvent);
   }
- void _createNewEvent() {
-      Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CreateEvent(widget.uid)),
-    );
-  }
-  void _showEventPage(Event myEvent) {
+  void _showEventPage(String documentID) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventDetails(myEvent: myEvent, uid: widget.uid,)),
+      MaterialPageRoute(builder: (context) => MyEventDetails(documentID: documentID,)),
     );
   }
+
+
 }
