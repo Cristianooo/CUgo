@@ -5,15 +5,26 @@ import 'package:cugo_project/Location.dart';
 import 'dart:async';
 
 class EditInformation extends StatefulWidget {
-  const EditInformation({this.snapshot, this.documentID});
-  final AsyncSnapshot snapshot;
-  final String documentID;
+  const EditInformation({this.document});
+  final DocumentSnapshot document;
 
   @override
   State<StatefulWidget> createState() => new _EditInformationState();
 }
 
+
 class _EditInformationState extends State<EditInformation> {
+
+DateTime _date = DateTime.now();
+@override
+  void initState() {
+    super.initState();
+  
+  _nameController.text = widget.document['name'];
+  _descController.text = widget.document['description'];
+  _currentItemSelected = widget.document['location'];
+  }
+
   static Location af = new Location(
       title: 'Argyros Forum', geopoint: GeoPoint(33.792995, -117.850680));
   static Location lib = new Location(
@@ -47,26 +58,12 @@ class _EditInformationState extends State<EditInformation> {
     musco
   ];
   String _currentItemSelected;
-  GeoPoint _tempLocation;
 
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
 
+  
 
-@override
-  void initState() {
-    super.initState();
-
-
-
-    _nameController.text = widget.snapshot.data.document[0]['name'];
-    _descController.text = widget.snapshot.data.document[0]['description'];
-    _currentItemSelected = widget.snapshot.data.document[0]['location'];
-
-    _date = widget.snapshot.data.document[0]['date'].toDate();
-    
-
-  }
 
   @override
   void dispose() {
@@ -75,7 +72,7 @@ class _EditInformationState extends State<EditInformation> {
     super.dispose();
   }
 
-  DateTime _date;
+  
   String _dateText = "";
   var eventDayFormat = new DateFormat("EEEE  MMMM d, y");
 
@@ -132,17 +129,13 @@ class _EditInformationState extends State<EditInformation> {
   void _saveEvent() {
     
     _finalDate = DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute);
-    for (Location myGeo in _chapLocations) {
-      if (_currentItemSelected == myGeo.title) {
-        _tempLocation = myGeo.geopoint;
-      }
-    }
-    Firestore.instance.collection('events').document(widget.documentID).updateData({
+
+    Firestore.instance.collection('events').document(widget.document.documentID).updateData({
       'name': _nameController.text,
       'description': _descController.text,
       'date': _finalDate,
       'location': _currentItemSelected,
-      'createdBy': widget.snapshot.data.document[0]['createdBy']
+      'createdBy': widget.document['createdBy']
     });
    Navigator.pop(context);
   }
@@ -161,7 +154,10 @@ class _EditInformationState extends State<EditInformation> {
             ),
           ],
         ),
-        body: Padding(
+        body:
+        
+        
+         Padding(
           padding: EdgeInsets.all(20),
           child: Column(children: <Widget>[
             Align(

@@ -14,6 +14,10 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEvent extends State<CreateEvent> {
+  bool _wheelchairAccess = false;
+  bool _seeingImpairedAccess = false;
+  bool _hearingImpairedAccess = false;
+
   static Location af = new Location(
       title: 'Argyros Forum', geopoint: GeoPoint(33.792995, -117.850680));
   static Location lib = new Location(
@@ -35,6 +39,10 @@ class _CreateEvent extends State<CreateEvent> {
   static Location musco = new Location(
       title: 'Musco Center for the Arts',
       geopoint: GeoPoint(33.794164, -117.852634));
+  static Location sandhu = new Location(
+      title: 'Sandhu Conference Center',
+      geopoint: GeoPoint(33.794164, -117.852634)); //Fix location
+    
   final _chapLocations = [
     af,
     lib,
@@ -44,13 +52,13 @@ class _CreateEvent extends State<CreateEvent> {
     fish,
     piazza,
     irvineHall,
-    musco
+    musco, 
+    sandhu
   ];
   String _currentItemSelected;
 
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
-  //final _locationController = TextEditingController();
 
   @override
   void dispose() {
@@ -95,7 +103,6 @@ class _CreateEvent extends State<CreateEvent> {
 
   String todString(TimeOfDay time) {
     int hourConvert = time.hour;
-    //int minConvert = time.minute;
     String ampm = "AM";
     if (time.hour > 12) {
       ampm = "PM";
@@ -143,6 +150,9 @@ class _CreateEvent extends State<CreateEvent> {
       'date': _finalDate,
       'monthDay': imgay,
       'location': _currentItemSelected,
+      'wheelchairAccess': _wheelchairAccess,
+      'seeingAccess': _seeingImpairedAccess,
+      'hearingAccess': _hearingImpairedAccess,
       'createdBy': widget.uid
     });
     Navigator.pop(context);
@@ -163,7 +173,9 @@ class _CreateEvent extends State<CreateEvent> {
         ),
         body: Padding(
           padding: EdgeInsets.all(20),
-          child: Column(children: <Widget>[
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
             Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
@@ -257,7 +269,60 @@ class _CreateEvent extends State<CreateEvent> {
                 },
                 value: _currentItemSelected,
               ),
+              Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                        child: Text('Accessibility',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        padding: EdgeInsets.only(top: 20)))
                 ]),
+                Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Checkbox(
+                                value: _wheelchairAccess,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    _wheelchairAccess = value;
+                                  });
+                                },
+                              ),
+                              Text('Physical accessibility', style: TextStyle(fontWeight: FontWeight.bold))
+                      ],
+                    ),
+                    Text('The location has wheelchair accessible parking, ramps, elevators, etc.', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
+                    Row(
+                      children: <Widget>[
+                        Checkbox(
+                                value: _seeingImpairedAccess,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    _seeingImpairedAccess = value;
+                                  });
+                                },
+                              ),
+                              Text('Visual accessibility', style: TextStyle(fontWeight: FontWeight.bold))
+                      ],
+                    ),
+                    Text('There is adequate lighting, audio information, signage has braille, etc.', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
+                    Row(
+                      children: <Widget>[
+                        Checkbox(
+                                value: _hearingImpairedAccess,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    _hearingImpairedAccess = value;
+                                  });
+                                },
+                              ),
+                              Text('Auditory accessibility', style: TextStyle(fontWeight: FontWeight.bold))
+                      ],
+                    ),
+                    Text('The event has accommodations such as ASL translator, subtitles, etc.', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey))
+                  ],
+                )
           ]),
         ));
   }

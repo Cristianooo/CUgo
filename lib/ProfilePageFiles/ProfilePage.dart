@@ -47,7 +47,7 @@ void findUserIdToken() async{                 //Assigns current user's id token 
                 height: MediaQuery.of(context).size.height / 3,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Color(0xFFA50034),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(200.0),
                     bottomRight: Radius.circular(200.0),

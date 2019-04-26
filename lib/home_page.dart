@@ -29,7 +29,8 @@ class HomePage extends StatelessWidget {
   final VoidCallback onSignedOut;
   
     void initState() {
-    WidgetsBinding.instance
+      findCorrectDB();
+      WidgetsBinding.instance
         .addPostFrameCallback((_) => findCorrectDB());
   }
 

@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cugo_project/Event.dart';
 import 'package:cugo_project/ProfilePageFiles/MyEventDetails.dart';
 
 
@@ -56,7 +55,7 @@ class _MyEventState extends State<MyEvents> {
                               subtitle: new Text(document['description']),
                               onTap: () {
                                 
-                                _showEventPage(document.documentID);
+                                _showEventPage(document);
                               }),
                           ListTile(
                               leading: const Icon(Icons.access_time),
@@ -64,7 +63,7 @@ class _MyEventState extends State<MyEvents> {
                                   .format(document['date'].toDate())),
                               onTap: () {
                                
-                               _showEventPage(document.documentID);
+                               _showEventPage(document);
                               }),
                         ],
                       )));
@@ -79,36 +78,11 @@ class _MyEventState extends State<MyEvents> {
     
     
   }
-  String eventLocation = "";
-  void assignAndCreateEvent(DocumentSnapshot document) {
-    if (document['location'] == GeoPoint(33.792895, -117.851275)) {
-      eventLocation = "Leatherby Libraries";
-    } else if (document['location'] == GeoPoint(33.792995, -117.850680)) {
-      eventLocation = "Argyros Forum";
-    }else if (document['location'] == GeoPoint(33.794054, -117.850903)) {
-      eventLocation = "Ernie Chapman Stadium";
-    }else if (document['location'] == GeoPoint(33.791995, -117.852535)) {
-      eventLocation = "Memorial Lawn";
-    }else if (document['location'] == GeoPoint(33.792895, -117.851275)) {
-      eventLocation = "Memorial Hall";
-    }else if (document['location'] == GeoPoint(33.793709, -117.852212)) {
-      eventLocation = "FISH Interfaith Center";
-    }else if (document['location'] == GeoPoint(33.793061, -117.851753)) {
-      eventLocation = "Atallah Piazza";
-    }else if (document['location'] == GeoPoint(33.792280, -117.850732)) {
-      eventLocation = "Irvine Lecture Hall";
-    }else if (document['location'] == GeoPoint(33.794164, -117.852634)) {
-      eventLocation = "Musco Center for the Arts";
-    }
-    //Event myEvent = new Event(document['name'], document['description'],
-    //    document['date'], eventLocation, document.documentID, document['createdBy']);
-   // _showEventPage(myEvent);
 
-  }
-  void _showEventPage(String documentID) {
+  void _showEventPage(DocumentSnapshot document) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MyEventDetails(documentID: documentID,)),
+      MaterialPageRoute(builder: (context) => MyEventDetails(documentID: document.documentID)),
     );
   }
 

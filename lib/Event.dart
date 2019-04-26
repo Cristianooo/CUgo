@@ -6,7 +6,14 @@ class Event {
   String location;
   String documentID; 
   String createdBy;
-  Event(this.name, this.description, this.date, this.location, this.documentID, this.createdBy);
+  bool wheelchairAccess;
+  bool seeingAccess;
+  bool hearingAccess;
+  Event({this.name, this.description, 
+  this.date, this.location, 
+  this.documentID, this.createdBy, 
+  this.wheelchairAccess, this.seeingAccess,
+  this.hearingAccess});
 
   
 }
