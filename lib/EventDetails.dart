@@ -236,6 +236,7 @@ Widget _buildSignUpButton(){
                   TextStyle(color: Colors.white)),
           onPressed:(){
             signUp();
+            doubleSignUp();
             setState(() {
                         
                         });
@@ -304,8 +305,16 @@ Widget _buildSignUpButton(){
     Firestore.instance
         .collection('events')
         .document(widget.currEvent.documentID)
+        .updateData({'usersSigned': FieldValue.arrayUnion([widget.uid])});
+  }
+
+  void doubleSignUp() {
+    Firestore.instance
+    .collection('events')
+        .document(widget.currEvent.documentID)
         .collection('usersGoing')
         .document()
         .setData({'UID': widget.uid});
   }
+
 }

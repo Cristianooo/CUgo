@@ -155,6 +155,7 @@ class _CreateEvent extends State<CreateEvent> {
       'hearingAccess': _hearingImpairedAccess,
       'createdBy': widget.uid
     });
+    
     Navigator.pop(context);
   }
 

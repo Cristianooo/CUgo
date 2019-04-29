@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cugo_project/ProfilePageFiles/LoginInformation.dart';
 import 'package:cugo_project/ProfilePageFiles/myEvents.dart';
+import 'package:cugo_project/ProfilePageFiles/myPastEvents.dart';
 
 import 'package:cugo_project/auth.dart';
 
@@ -164,6 +165,15 @@ void findUserIdToken() async{                 //Assigns current user's id token 
                          child: Text('My Events', style: TextStyle(color: Colors.black)),
                       ),
                       onPressed: _showEvents,
+                      
+                    ),
+                    RaisedButton(
+                      child: new Align(
+                         alignment: Alignment.centerLeft,
+                         child: Text('My Event History', style: TextStyle(color: Colors.black)),
+                      ),
+                      onPressed: _showPastEvents,
+                      
                     ),
                     const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
                     RaisedButton(
@@ -198,6 +208,13 @@ void findUserIdToken() async{                 //Assigns current user's id token 
     Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => MyEvents(userUID: widget.userUID,)),
+            );
+  }
+  void _showPastEvents(){
+    findUserIdToken();
+    Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyPastEvents(userUID: widget.userUID,)),
             );
   }
   
